@@ -210,7 +210,7 @@ void TlsChannelSecurityConnector::check_peer(
   }
   *auth_context =
       grpc_ssl_peer_to_auth_context(&peer, GRPC_TLS_TRANSPORT_SECURITY_TYPE);
-  if (options_->server_verification_option() == GRPC_TLS_SERVER_VERIFICATION) {
+  if (options_->server_verification_option() == GRPC_TLS_SERVER_VERIFICATION || options_->server_verification_option() == GRPC_TLS_SGX_SERVER_VERIFICATION) {
     /* Do the default host name check if specifying the target name. */
     error = internal::TlsCheckHostName(target_name, &peer);
     if (error != GRPC_ERROR_NONE) {

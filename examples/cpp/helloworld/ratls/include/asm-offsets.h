@@ -1,0 +1,396 @@
+/* DO NOT MODIFY. THIS FILE WAS AUTO-GENERATED. */
+#ifndef ASM_OFFSETS_H_
+#define ASM_OFFSETS_H_
+
+#ifndef SGX_FLAGS_DEBUG
+#define SGX_FLAGS_DEBUG 2
+#endif
+#ifndef SGX_FLAGS_MODE64BIT
+#define SGX_FLAGS_MODE64BIT 4
+#endif
+#ifndef SGX_XFRM_LEGACY
+#define SGX_XFRM_LEGACY 3
+#endif
+#ifndef SGX_XFRM_AVX
+#define SGX_XFRM_AVX 6
+#endif
+#ifndef SGX_XFRM_MPX
+#define SGX_XFRM_MPX 24
+#endif
+#ifndef SGX_XFRM_AVX512
+#define SGX_XFRM_AVX512 230
+#endif
+#ifndef SGX_XFRM_PKRU
+#define SGX_XFRM_PKRU 512
+#endif
+#ifndef SGX_MISCSELECT_EXINFO
+#define SGX_MISCSELECT_EXINFO 1
+#endif
+#ifndef SE_KEY_SIZE
+#define SE_KEY_SIZE 384
+#endif
+#ifndef STACK_PROTECTOR_CANARY_DEFAULT
+#define STACK_PROTECTOR_CANARY_DEFAULT 205452675308461
+#endif
+#ifndef SGX_HASH_SIZE
+#define SGX_HASH_SIZE 32
+#endif
+#ifndef SGX_GPR_RAX
+#define SGX_GPR_RAX 0
+#endif
+#ifndef SGX_GPR_RCX
+#define SGX_GPR_RCX 8
+#endif
+#ifndef SGX_GPR_RDX
+#define SGX_GPR_RDX 16
+#endif
+#ifndef SGX_GPR_RBX
+#define SGX_GPR_RBX 24
+#endif
+#ifndef SGX_GPR_RSP
+#define SGX_GPR_RSP 32
+#endif
+#ifndef SGX_GPR_RBP
+#define SGX_GPR_RBP 40
+#endif
+#ifndef SGX_GPR_RSI
+#define SGX_GPR_RSI 48
+#endif
+#ifndef SGX_GPR_RDI
+#define SGX_GPR_RDI 56
+#endif
+#ifndef SGX_GPR_R8
+#define SGX_GPR_R8 64
+#endif
+#ifndef SGX_GPR_R9
+#define SGX_GPR_R9 72
+#endif
+#ifndef SGX_GPR_R10
+#define SGX_GPR_R10 80
+#endif
+#ifndef SGX_GPR_R11
+#define SGX_GPR_R11 88
+#endif
+#ifndef SGX_GPR_R12
+#define SGX_GPR_R12 96
+#endif
+#ifndef SGX_GPR_R13
+#define SGX_GPR_R13 104
+#endif
+#ifndef SGX_GPR_R14
+#define SGX_GPR_R14 112
+#endif
+#ifndef SGX_GPR_R15
+#define SGX_GPR_R15 120
+#endif
+#ifndef SGX_GPR_RFLAGS
+#define SGX_GPR_RFLAGS 128
+#endif
+#ifndef SGX_GPR_RIP
+#define SGX_GPR_RIP 136
+#endif
+#ifndef SGX_GPR_EXITINFO
+#define SGX_GPR_EXITINFO 160
+#endif
+#ifndef SGX_GPR_SIZE
+#define SGX_GPR_SIZE 184
+#endif
+#ifndef SGX_CPU_CONTEXT_RAX
+#define SGX_CPU_CONTEXT_RAX 0
+#endif
+#ifndef SGX_CPU_CONTEXT_RCX
+#define SGX_CPU_CONTEXT_RCX 8
+#endif
+#ifndef SGX_CPU_CONTEXT_RDX
+#define SGX_CPU_CONTEXT_RDX 16
+#endif
+#ifndef SGX_CPU_CONTEXT_RBX
+#define SGX_CPU_CONTEXT_RBX 24
+#endif
+#ifndef SGX_CPU_CONTEXT_RSP
+#define SGX_CPU_CONTEXT_RSP 32
+#endif
+#ifndef SGX_CPU_CONTEXT_RBP
+#define SGX_CPU_CONTEXT_RBP 40
+#endif
+#ifndef SGX_CPU_CONTEXT_RSI
+#define SGX_CPU_CONTEXT_RSI 48
+#endif
+#ifndef SGX_CPU_CONTEXT_RDI
+#define SGX_CPU_CONTEXT_RDI 56
+#endif
+#ifndef SGX_CPU_CONTEXT_R8
+#define SGX_CPU_CONTEXT_R8 64
+#endif
+#ifndef SGX_CPU_CONTEXT_R9
+#define SGX_CPU_CONTEXT_R9 72
+#endif
+#ifndef SGX_CPU_CONTEXT_R10
+#define SGX_CPU_CONTEXT_R10 80
+#endif
+#ifndef SGX_CPU_CONTEXT_R11
+#define SGX_CPU_CONTEXT_R11 88
+#endif
+#ifndef SGX_CPU_CONTEXT_R12
+#define SGX_CPU_CONTEXT_R12 96
+#endif
+#ifndef SGX_CPU_CONTEXT_R13
+#define SGX_CPU_CONTEXT_R13 104
+#endif
+#ifndef SGX_CPU_CONTEXT_R14
+#define SGX_CPU_CONTEXT_R14 112
+#endif
+#ifndef SGX_CPU_CONTEXT_R15
+#define SGX_CPU_CONTEXT_R15 120
+#endif
+#ifndef SGX_CPU_CONTEXT_RFLAGS
+#define SGX_CPU_CONTEXT_RFLAGS 128
+#endif
+#ifndef SGX_CPU_CONTEXT_RIP
+#define SGX_CPU_CONTEXT_RIP 136
+#endif
+#ifndef SGX_CPU_CONTEXT_SIZE
+#define SGX_CPU_CONTEXT_SIZE 144
+#endif
+#ifndef SGX_CPU_CONTEXT_XSTATE_ALIGN_SUB
+#define SGX_CPU_CONTEXT_XSTATE_ALIGN_SUB 16
+#endif
+#ifndef SGX_COMMON_SELF
+#define SGX_COMMON_SELF 0
+#endif
+#ifndef SGX_COMMON_STACK_PROTECTOR_CANARY
+#define SGX_COMMON_STACK_PROTECTOR_CANARY 8
+#endif
+#ifndef SGX_ENCLAVE_SIZE
+#define SGX_ENCLAVE_SIZE 272
+#endif
+#ifndef SGX_TCS_OFFSET
+#define SGX_TCS_OFFSET 280
+#endif
+#ifndef SGX_INITIAL_STACK_ADDR
+#define SGX_INITIAL_STACK_ADDR 288
+#endif
+#ifndef SGX_TMP_RIP
+#define SGX_TMP_RIP 296
+#endif
+#ifndef SGX_ECALL_RETURN_ADDR
+#define SGX_ECALL_RETURN_ADDR 320
+#endif
+#ifndef SGX_SIG_STACK_LOW
+#define SGX_SIG_STACK_LOW 304
+#endif
+#ifndef SGX_SIG_STACK_HIGH
+#define SGX_SIG_STACK_HIGH 312
+#endif
+#ifndef SGX_SSA
+#define SGX_SSA 328
+#endif
+#ifndef SGX_GPR
+#define SGX_GPR 336
+#endif
+#ifndef SGX_EXIT_TARGET
+#define SGX_EXIT_TARGET 344
+#endif
+#ifndef SGX_FSBASE
+#define SGX_FSBASE 352
+#endif
+#ifndef SGX_PRE_OCALL_STACK
+#define SGX_PRE_OCALL_STACK 360
+#endif
+#ifndef SGX_USTACK_TOP
+#define SGX_USTACK_TOP 368
+#endif
+#ifndef SGX_USTACK
+#define SGX_USTACK 376
+#endif
+#ifndef SGX_THREAD
+#define SGX_THREAD 384
+#endif
+#ifndef SGX_OCALL_EXIT_CALLED
+#define SGX_OCALL_EXIT_CALLED 392
+#endif
+#ifndef SGX_THREAD_STARTED
+#define SGX_THREAD_STARTED 400
+#endif
+#ifndef SGX_READY_FOR_EXCEPTIONS
+#define SGX_READY_FOR_EXCEPTIONS 408
+#endif
+#ifndef SGX_MANIFEST_SIZE
+#define SGX_MANIFEST_SIZE 416
+#endif
+#ifndef SGX_HEAP_MIN
+#define SGX_HEAP_MIN 424
+#endif
+#ifndef SGX_HEAP_MAX
+#define SGX_HEAP_MAX 432
+#endif
+#ifndef SGX_CLEAR_CHILD_TID
+#define SGX_CLEAR_CHILD_TID 440
+#endif
+#ifndef PAL_TCB_URTS_TCS
+#define PAL_TCB_URTS_TCS 8
+#endif
+#ifndef PAL_TCB_URTS_IN_AEX_PROF
+#define PAL_TCB_URTS_IN_AEX_PROF 32
+#endif
+#ifndef PAL_TCB_URTS_EENTER_CNT
+#define PAL_TCB_URTS_EENTER_CNT 40
+#endif
+#ifndef PAL_TCB_URTS_EEXIT_CNT
+#define PAL_TCB_URTS_EEXIT_CNT 48
+#endif
+#ifndef PAL_TCB_URTS_AEX_CNT
+#define PAL_TCB_URTS_AEX_CNT 56
+#endif
+#ifndef TCS_FLAGS
+#define TCS_FLAGS 8
+#endif
+#ifndef TCS_OSSA
+#define TCS_OSSA 16
+#endif
+#ifndef TCS_CSSA
+#define TCS_CSSA 24
+#endif
+#ifndef TCS_NSSA
+#define TCS_NSSA 28
+#endif
+#ifndef TCS_OENTRY
+#define TCS_OENTRY 32
+#endif
+#ifndef TCS_OFS_BASE
+#define TCS_OFS_BASE 48
+#endif
+#ifndef TCS_OGS_BASE
+#define TCS_OGS_BASE 56
+#endif
+#ifndef TCS_OFS_LIMIT
+#define TCS_OFS_LIMIT 64
+#endif
+#ifndef TCS_OGS_LIMIT
+#define TCS_OGS_LIMIT 68
+#endif
+#ifndef TCS_SIZE
+#define TCS_SIZE 4096
+#endif
+#ifndef SGX_ATTRIBUTES_XFRM
+#define SGX_ATTRIBUTES_XFRM 8
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_HEADER
+#define SGX_ARCH_ENCLAVE_CSS_HEADER 0
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_TYPE
+#define SGX_ARCH_ENCLAVE_CSS_TYPE 12
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_MODULE_VENDOR
+#define SGX_ARCH_ENCLAVE_CSS_MODULE_VENDOR 16
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_DATE
+#define SGX_ARCH_ENCLAVE_CSS_DATE 20
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_HEADER2
+#define SGX_ARCH_ENCLAVE_CSS_HEADER2 24
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_HW_VERSION
+#define SGX_ARCH_ENCLAVE_CSS_HW_VERSION 40
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_MODULUS
+#define SGX_ARCH_ENCLAVE_CSS_MODULUS 128
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_EXPONENT
+#define SGX_ARCH_ENCLAVE_CSS_EXPONENT 512
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_SIGNATURE
+#define SGX_ARCH_ENCLAVE_CSS_SIGNATURE 516
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_MISC_SELECT
+#define SGX_ARCH_ENCLAVE_CSS_MISC_SELECT 900
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_MISC_MASK
+#define SGX_ARCH_ENCLAVE_CSS_MISC_MASK 904
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ISV_FAMILY_ID
+#define SGX_ARCH_ENCLAVE_CSS_ISV_FAMILY_ID 912
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES
+#define SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES 928
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ATTRIBUTE_MASK
+#define SGX_ARCH_ENCLAVE_CSS_ATTRIBUTE_MASK 944
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH
+#define SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH 960
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ISVEXT_PROD_ID
+#define SGX_ARCH_ENCLAVE_CSS_ISVEXT_PROD_ID 1008
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID
+#define SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID 1024
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_ISV_SVN
+#define SGX_ARCH_ENCLAVE_CSS_ISV_SVN 1026
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_Q1
+#define SGX_ARCH_ENCLAVE_CSS_Q1 1040
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_Q2
+#define SGX_ARCH_ENCLAVE_CSS_Q2 1424
+#endif
+#ifndef SGX_ARCH_ENCLAVE_CSS_SIZE
+#define SGX_ARCH_ENCLAVE_CSS_SIZE 1808
+#endif
+#ifndef PAL_SEC_ENCLAVE_ATTRIBUTES
+#define PAL_SEC_ENCLAVE_ATTRIBUTES 600
+#endif
+#ifndef SSA_FRAME_NUM
+#define SSA_FRAME_NUM 2
+#endif
+#ifndef SSA_FRAME_SIZE
+#define SSA_FRAME_SIZE 16384
+#endif
+#ifndef ENCLAVE_STACK_SIZE
+#define ENCLAVE_STACK_SIZE 262144
+#endif
+#ifndef ENCLAVE_SIG_STACK_SIZE
+#define ENCLAVE_SIG_STACK_SIZE 65536
+#endif
+#ifndef DEFAULT_ENCLAVE_BASE
+#define DEFAULT_ENCLAVE_BASE 0
+#endif
+#ifndef MMAP_MIN_ADDR
+#define MMAP_MIN_ADDR 65536
+#endif
+#ifndef PAGESIZE
+#define PAGESIZE 4096
+#endif
+#ifndef PAL_EVENT_NUM_BOUND
+#define PAL_EVENT_NUM_BOUND 6
+#endif
+#ifndef EINTR
+#define EINTR 4
+#endif
+#ifndef ECALL_ENCLAVE_START
+#define ECALL_ENCLAVE_START 0
+#endif
+#ifndef ECALL_THREAD_START
+#define ECALL_THREAD_START 1
+#endif
+#ifndef ECALL_THREAD_RESET
+#define ECALL_THREAD_RESET 2
+#endif
+#ifndef OCALL_EXIT
+#define OCALL_EXIT 0
+#endif
+#ifndef XSAVE_HEADER_OFFSET
+#define XSAVE_HEADER_OFFSET 512
+#endif
+#ifndef PAL_XSTATE_ALIGN
+#define PAL_XSTATE_ALIGN 64
+#endif
+#ifndef PAL_FP_XSTATE_MAGIC2_SIZE
+#define PAL_FP_XSTATE_MAGIC2_SIZE 4
+#endif
+#ifndef SGX_DCAP
+#define SGX_DCAP 1
+#endif
+
+#endif /* ASM_OFFSETS_H_ */
