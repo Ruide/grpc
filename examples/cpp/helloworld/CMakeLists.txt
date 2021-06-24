@@ -56,9 +56,11 @@ target_link_libraries(hw_grpc_proto
   ${_GRPC_GRPCPP}
   ${_PROTOBUF_LIBPROTOBUF})
 
+include_directories("./../../../include")
+
 # Targets greeter_[async_](client|server)
 foreach(_target
-  greeter_client greeter_server
+  greeter_client
   greeter_async_client greeter_async_client2 greeter_async_server)
   add_executable(${_target} "${_target}.cc")
   target_link_libraries(${_target}
@@ -67,3 +69,27 @@ foreach(_target
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
 endforeach()
+
+LINK_DIRECTORIES(./ratls/lib)
+include_directories(./ratls/include)
+LINK_DIRECTORIES(./mbedtls/install/lib)
+include_directories(./mbedtls/install/include)
+
+# add_library(ra_tls_attest SHARED IMPORTED)
+# set_property(TARGET ra_tls_attest PROPERTY IMPORTED_LOCATION "/home/rd/Github/graphene/Examples/grpc/cpp/grpc/examples/cpp/helloworld/ratls/lib/libra_tls_attest.so")
+
+
+foreach(_target
+  greeter_server)
+  add_executable(${_target} "${_target}.cc")
+  target_link_libraries(${_target}
+    hw_grpc_proto
+    ${_REFLECTION}
+    ${_GRPC_GRPCPP}
+    ${_PROTOBUF_LIBPROTOBUF}
+    libmbedtls.a
+    libmbedcrypto.a
+    libmbedx509.a
+    ra_tls_attest)
+endforeach()
+

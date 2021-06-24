@@ -21,6 +21,7 @@
 #include <string>
 
 #include <grpcpp/grpcpp.h>
+#include "grpc/grpc_security_constants.h"
 
 #ifdef BAZEL_BUILD
 #include "examples/protos/helloworld.grpc.pb.h"
@@ -98,8 +99,12 @@ int main(int argc, char** argv) {
   } else {
     target_str = "localhost:50051";
   }
+  // auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
+  auto chan_opts = grpc::experimental::TlsChannelCredentialsOptions();
+  chan_opts.set_server_verification_option(GRPC_TLS_SGX_SERVER_VERIFICATION);
+  auto channel_creds = grpc::experimental::TlsCredentials(chan_opts); 
   GreeterClient greeter(
-      grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+      grpc::CreateChannel(target_str, channel_creds));
   std::string user("world");
   std::string reply = greeter.SayHello(user);
   std::cout << "Greeter received: " << reply << std::endl;

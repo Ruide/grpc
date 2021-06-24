@@ -26,7 +26,7 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
            -ldl
 else
 LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -pthread\
+	   -pthread\
            -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            -ldl
 endif
