@@ -84,7 +84,6 @@ std::string loadFile(const std::string& filename)
 #include "mbedtls/pem.h"
 #include "mbedtls/base64.h"
 
-
 #include "ra_tls.h"
 #include "sgx_arch.h"
 
@@ -159,28 +158,36 @@ void RunServer() {
   std::string s_private_key_pem((char*) private_key_pem);
   std::string s_cert_pem((char*) cert_pem);
 
-	grpc::SslServerCredentialsOptions::PemKeyCertPair pair;  
-  pair.private_key = s_private_key_pem;
-  pair.cert_chain = s_cert_pem;
+	// grpc::SslServerCredentialsOptions::PemKeyCertPair pair;  
+  // pair.private_key = s_private_key_pem;
+  // pair.cert_chain = s_cert_pem;
 
-  grpc::SslServerCredentialsOptions sslopt;
-  sslopt.pem_root_certs="";
-  sslopt.pem_key_cert_pairs.push_back(pair);
+  // grpc::SslServerCredentialsOptions sslopt;
+  // sslopt.pem_root_certs="";
+  // sslopt.pem_key_cert_pairs.push_back(pair);
 
-  // auto tlsopt = grpc::experimental::TlsServerCredentialsOptions();
+  grpc::experimental::IdentityKeyCertPair key_cert_pair;
+  key_cert_pair.private_key = s_private_key_pem;
+  key_cert_pair.certificate_chain = s_cert_pem;
+  std::vector<grpc::experimental::IdentityKeyCertPair> identity_key_cert_pairs;
+  identity_key_cert_pairs.emplace_back(key_cert_pair);
+  auto certificate_provider = std::make_shared<grpc::experimental::StaticDataCertificateProvider>(
+      identity_key_cert_pairs);
+  grpc::experimental::TlsServerCredentialsOptions options(certificate_provider);
+  // options.watch_root_certs();
+  options.set_root_cert_name("root_cert_name");
+  options.watch_identity_key_cert_pairs();
+  options.set_identity_cert_name("identity_cert_name");
+  options.set_cert_request_type(
+      GRPC_SSL_DONT_REQUEST_CLIENT_CERTIFICATE);
+  auto server_credentials = grpc::experimental::TlsServerCredentials(options);
 
-  // https://cpp.hotexamples.com/examples/-/ServerBuilder/-/cpp-serverbuilder-class-examples.html
-	// sslopt.pem_root_certs = loadFile("ca.cert.pem");
-	// pair.private_key = loadFile("server.key.pem");
-	// pair.cert_chain = loadFile("server.cert.pem");
-	// sslopt.pem_key_cert_pairs.emplace_back(std::move(pair));
 
-  auto channel_creds = grpc::SslServerCredentials(sslopt);
+  // auto channel_creds = grpc::SslServerCredentials(sslopt);
   
   // Listen on the given address with ssl authentication mechanism.
   ServerBuilder builder;
-  builder.AddListeningPort(server_address, channel_creds);
-  // builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+  builder.AddListeningPort(server_address, server_credentials);
   // Register "service" as the instance through which we'll communicate with
   // clients. In this case it corresponds to an *synchronous* service.
   builder.RegisterService(&service);
