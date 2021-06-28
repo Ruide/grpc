@@ -81,6 +81,9 @@ std::string loadFile(const std::string& filename)
 #include "mbedtls/pk.h"
 #include "mbedtls/ecdsa.h"
 #include "mbedtls/rsa.h"
+#include "mbedtls/pem.h"
+#include "mbedtls/base64.h"
+
 
 #include "ra_tls.h"
 #include "sgx_arch.h"
@@ -111,19 +114,11 @@ void RunServer() {
   void* ra_tls_attest_lib     = NULL;
   ra_tls_create_key_and_crt_f = NULL;
   
-  mbedtls_entropy_context entropy;
-  mbedtls_ctr_drbg_context ctr_drbg;
-  mbedtls_ssl_context ssl;
-  mbedtls_ssl_config conf;
   mbedtls_x509_crt srvcert;
   mbedtls_pk_context pkey;
 
-  mbedtls_ssl_init(&ssl);
-  mbedtls_ssl_config_init(&conf);
   mbedtls_x509_crt_init(&srvcert);
   mbedtls_pk_init(&pkey);
-  mbedtls_entropy_init(&entropy);
-  mbedtls_ctr_drbg_init(&ctr_drbg);  
   
   ra_tls_attest_lib = dlopen("libra_tls_attest.so", RTLD_LAZY);
   if (!ra_tls_attest_lib) {
@@ -144,6 +139,7 @@ void RunServer() {
           throw std::runtime_error(std::string("failed\n  !  ra_tls_create_key_and_crt returned %d\n\n", ret));
       }
       printf(" ok\n");
+      fflush(stdout);
     }
 
   unsigned char private_key_pem[16000];
@@ -151,28 +147,33 @@ void RunServer() {
   if( ( ret = mbedtls_pk_write_key_pem( &pkey, private_key_pem, 16000 ) ) != 0 )
       throw std::runtime_error(std::string("something went wrong while extracting private key"));
 
-  // unsigned char cert_pem[4096];
-  // if( ( ret = mbedtls_x509write_crt_pem( &g_my_ratls_cert, cert_pem, 4096, NULL /*f_rng*/, NULL /*p_rng*/) ) != 0 )
-  //     throw std::runtime_error(std::string("something went wrong while extracting private key"));
+  unsigned char cert_pem[16000];
+  size_t olen;
+  if( ( ret = mbedtls_pem_write_buffer( PEM_BEGIN_CRT, PEM_END_CRT,
+                                        srvcert.raw.p, srvcert.raw.len,
+                                        cert_pem, 16000, &olen ) ) != 0 );
 
-  // int mbedtls_pem_write_buffer( const char *header, const char *footer,
-  //                       const unsigned char *der_data, size_t der_len,
-  //                       unsigned char *buf, size_t buf_len, size_t *olen )
+  std::cout << private_key_pem << std::endl;
+  std::cout << cert_pem << std::endl;
 
-  // if( ( ret = mbedtls_pem_write_buffer( PEM_BEGIN_CRT, PEM_END_CRT,
-  //                                       g_my_ratls_cert.raw, ret,
-  //                                       buf, size, &olen ) ) != 0 )
+  std::string s_private_key_pem((char*) private_key_pem);
+  std::string s_cert_pem((char*) cert_pem);
 
+	grpc::SslServerCredentialsOptions::PemKeyCertPair pair;  
+  pair.private_key = s_private_key_pem;
+  pair.cert_chain = s_cert_pem;
 
-	grpc::SslServerCredentialsOptions sslopt;
-	grpc::SslServerCredentialsOptions::PemKeyCertPair pair;
-	// sslopt.pem_root_certs = loadFile("ca.cert.pem"); // replace with mbed self-signed root CA
-	// pair.private_key = loadFile("server.key.pem"); // replace with mbed private key
-	// sslopt.pem_root_certs = reinterpret_cast<char*> (cert_pem);
-  pair.private_key = reinterpret_cast<char*> (private_key_pem);
-  // pair.cert_chain = loadFile("server.cert.pem"); // ratls no cert chain
-	sslopt.pem_key_cert_pairs.emplace_back(std::move(pair));
-  auto channel_creds = grpc::SslServerCredentials(grpc::SslServerCredentialsOptions(sslopt));
+  grpc::SslServerCredentialsOptions sslopt;
+  sslopt.pem_root_certs="";
+  sslopt.pem_key_cert_pairs.push_back(pair);
+
+  // https://cpp.hotexamples.com/examples/-/ServerBuilder/-/cpp-serverbuilder-class-examples.html
+	// sslopt.pem_root_certs = loadFile("ca.cert.pem");
+	// pair.private_key = loadFile("server.key.pem");
+	// pair.cert_chain = loadFile("server.cert.pem");
+	// sslopt.pem_key_cert_pairs.emplace_back(std::move(pair));
+
+  auto channel_creds = grpc::SslServerCredentials(sslopt);
   
   // Listen on the given address with ssl authentication mechanism.
   ServerBuilder builder;
