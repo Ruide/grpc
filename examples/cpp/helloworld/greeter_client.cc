@@ -19,6 +19,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <fstream>
 
 #include <grpcpp/grpcpp.h>
 #include "grpc/grpc_security_constants.h"
@@ -99,12 +100,29 @@ int main(int argc, char** argv) {
   } else {
     target_str = "localhost:50051";
   }
-  // auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
-  auto chan_opts = grpc::experimental::TlsChannelCredentialsOptions();
-  chan_opts.set_server_verification_option(GRPC_TLS_SGX_SERVER_VERIFICATION);
-  auto channel_creds = grpc::experimental::TlsCredentials(chan_opts); 
+
+  auto ssl_opts = grpc::SslCredentialsOptions();
+  std::ifstream ifs("server.crt");
+  std::string content( (std::istreambuf_iterator<char>(ifs)),
+                       (std::istreambuf_iterator<char>()));
+
+  ssl_opts.pem_root_certs=content;
+  auto channel_creds = grpc::SslCredentials(ssl_opts);
+
+  // auto chan_opts = grpc::experimental::TlsChannelCredentialsOptions();
+  // chan_opts.set_server_verification_option(GRPC_TLS_SGX_SERVER_VERIFICATION);
+  // chan_opts.set_server_verification_option(GRPC_TLS_SKIP_ALL_SERVER_VERIFICATION);
+  // auto channel_creds = grpc::experimental::TlsCredentials(chan_opts); 
+
+  // GreeterClient greeter(
+      // grpc::CreateChannel(target_str, channel_creds));
+
+  auto channel_args = grpc::ChannelArguments();
+  channel_args.SetSslTargetNameOverride("RATLS");
+  
   GreeterClient greeter(
-      grpc::CreateChannel(target_str, channel_creds));
+      grpc::CreateCustomChannel(target_str, channel_creds, channel_args));
+      
   std::string user("world");
   std::string reply = greeter.SayHello(user);
   std::cout << "Greeter received: " << reply << std::endl;
