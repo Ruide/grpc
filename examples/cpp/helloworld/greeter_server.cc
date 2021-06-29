@@ -152,19 +152,8 @@ void RunServer() {
                                         srvcert.raw.p, srvcert.raw.len,
                                         cert_pem, 16000, &olen ) ) != 0 );
 
-  std::cout << private_key_pem << std::endl;
-  std::cout << cert_pem << std::endl;
-
   std::string s_private_key_pem((char*) private_key_pem);
   std::string s_cert_pem((char*) cert_pem);
-
-	// grpc::SslServerCredentialsOptions::PemKeyCertPair pair;  
-  // pair.private_key = s_private_key_pem;
-  // pair.cert_chain = s_cert_pem;
-
-  // grpc::SslServerCredentialsOptions sslopt;
-  // sslopt.pem_root_certs="";
-  // sslopt.pem_key_cert_pairs.push_back(pair);
 
   grpc::experimental::IdentityKeyCertPair key_cert_pair;
   key_cert_pair.private_key = s_private_key_pem;

@@ -156,9 +156,6 @@ class TlsSGXServerAuthorizationCheck
     char cert_pem[16000];
     peer_cert_buf.copy(cert_pem, peer_cert_buf.length(), 0);
 
-    std::cout << peer_cert_buf.length() << std::endl;
-    fflush(stdout);
-
     ret = mbedtls_x509_crt_parse(&peer_cert, (const unsigned char*) cert_pem , 16000);
     if (ret != 0) {
       throw std::runtime_error(std::string("something went wrong while parsing peer certificate"));
@@ -169,18 +166,15 @@ class TlsSGXServerAuthorizationCheck
       throw std::runtime_error(std::string("something went wrong while verifying quote"));
     }
 
+    //TODO: verify peer_cert as usual way
+
     arg->set_success(1);
-    // auto peer_cert = arg->peer_cert();
-    // std::cout << peer_cert << std::endl;
-    // fflush(stdout);
     arg->set_status(GRPC_STATUS_OK);
     return 0;
   }
 
   void Cancel(grpc::experimental::TlsServerAuthorizationCheckArg* arg) override {
     GPR_ASSERT(arg != nullptr);
-    std::cout << "now at Cancel" << std::endl;
-    fflush(stdout);
     arg->set_status(GRPC_STATUS_PERMISSION_DENIED);
     arg->set_error_details("cancelled");
   }
