@@ -60,7 +60,6 @@ include_directories("./../../../include")
 
 # Targets greeter_[async_](client|server)
 foreach(_target
-  greeter_client
   greeter_async_client greeter_async_client2 greeter_async_server)
   add_executable(${_target} "${_target}.cc")
   target_link_libraries(${_target}
@@ -80,7 +79,7 @@ include_directories(./mbedtls/install/include)
 
 
 foreach(_target
-  greeter_server)
+  greeter_server greeter_client)
   add_executable(${_target} "${_target}.cc")
   target_link_libraries(${_target}
     hw_grpc_proto

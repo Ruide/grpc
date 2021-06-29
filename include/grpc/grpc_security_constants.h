@@ -145,8 +145,6 @@ typedef enum {
      Client is responsible for verifying server's identity and
      server's certificate via server authorization check callback. */
   GRPC_TLS_SKIP_ALL_SERVER_VERIFICATION,
-  /** Performs SGX Quote validation in addition to TLS Server Verification*/
-  GRPC_TLS_SGX_SERVER_VERIFICATION
 } grpc_tls_server_verification_option;
 
 /**
