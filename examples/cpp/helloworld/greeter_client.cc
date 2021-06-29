@@ -166,7 +166,7 @@ class TlsSGXServerAuthorizationCheck
       throw std::runtime_error(std::string("something went wrong while verifying quote"));
     }
 
-    //TODO: verify peer_cert as usual way
+    //TODO: verify peer_cert as usual way, verify the self-signed certificate signature and tis properties ...
 
     arg->set_success(1);
     arg->set_status(GRPC_STATUS_OK);
