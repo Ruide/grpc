@@ -76,19 +76,98 @@ class GreeterClient {
 
 #include "grpc/support/string_util.h"
 
+#include <dlfcn.h>
+#include "mbedtls/certs.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/debug.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/error.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/ssl.h"
+
+#define mbedtls_printf printf
+
+/* RA-TLS: on client, only need to register ra_tls_verify_callback() for cert verification */
+int (*ra_tls_verify_callback_f)(void* data, mbedtls_x509_crt* crt, int depth, uint32_t* flags);
+
+/* RA-TLS: if specified in command-line options, use our own callback to verify SGX measurements */
+void (*ra_tls_set_measurement_callback_f)(int (*f_cb)(const char* mrenclave, const char* mrsigner,
+                                          const char* isv_prod_id, const char* isv_svn));
+
+static int parse_hex(const char* hex, void* buffer, size_t buffer_size) {
+    if (strlen(hex) != buffer_size * 2)
+        return -1;
+
+    for (size_t i = 0; i < buffer_size; i++) {
+        if (!isxdigit(hex[i * 2]) || !isxdigit(hex[i * 2 + 1]))
+            return -1;
+        sscanf(hex + i * 2, "%02hhx", &((uint8_t*)buffer)[i]);
+    }
+    return 0;
+}
+
+/* expected SGX measurements in binary form */
+static char g_expected_mrenclave[32];
+static char g_expected_mrsigner[32];
+static char g_expected_isv_prod_id[2];
+static char g_expected_isv_svn[2];
+
+static bool g_verify_mrenclave   = false;
+static bool g_verify_mrsigner    = false;
+static bool g_verify_isv_prod_id = false;
+static bool g_verify_isv_svn     = false;
+
+/* RA-TLS: our own callback to verify SGX measurements */
+static int my_verify_measurements(const char* mrenclave, const char* mrsigner,
+                                  const char* isv_prod_id, const char* isv_svn) {
+    assert(mrenclave && mrsigner && isv_prod_id && isv_svn);
+
+    if (g_verify_mrenclave &&
+            memcmp(mrenclave, g_expected_mrenclave, sizeof(g_expected_mrenclave)))
+        return -1;
+
+    if (g_verify_mrsigner &&
+            memcmp(mrsigner, g_expected_mrsigner, sizeof(g_expected_mrsigner)))
+        return -1;
+
+    if (g_verify_isv_prod_id &&
+            memcmp(isv_prod_id, g_expected_isv_prod_id, sizeof(g_expected_isv_prod_id)))
+        return -1;
+
+    if (g_verify_isv_svn &&
+            memcmp(isv_svn, g_expected_isv_svn, sizeof(g_expected_isv_svn)))
+        return -1;
+
+    return 0;
+}
+
 class TlsSGXServerAuthorizationCheck
     : public grpc::experimental::TlsServerAuthorizationCheckInterface {
   int Schedule(grpc::experimental::TlsServerAuthorizationCheckArg* arg) override {
     GPR_ASSERT(arg != nullptr);
-    // std::cout << "now at Schedule" << std::endl;
-    // fflush(stdout);
-    // std::string cb_user_data = "cb_user_data";
-    // arg->set_cb_user_data(static_cast<void*>(gpr_strdup(cb_user_data.c_str())));
-    // arg->set_success(1);
-    // arg->set_target_name("sync_target_name");
-    // arg->set_peer_cert("sync_peer_cert");
-    // arg->set_status(GRPC_STATUS_OK);
-    // arg->set_error_details("sync_error_details");
+
+    int ret;
+
+    void* dummy_data;
+    mbedtls_x509_crt peer_cert;  
+    mbedtls_x509_crt_init(&peer_cert);
+    auto peer_cert_buf = arg->peer_cert();
+
+    char cert_pem[16000];
+    peer_cert_buf.copy(cert_pem, peer_cert_buf.length(), 0);
+
+    std::cout << peer_cert_buf.length() << std::endl;
+    fflush(stdout);
+
+    ret = mbedtls_x509_crt_parse(&peer_cert, (const unsigned char*) cert_pem , 16000);
+    if (ret != 0) {
+      throw std::runtime_error(std::string("something went wrong while parsing peer certificate"));
+    }
+    
+    ret = (*ra_tls_verify_callback_f)(dummy_data, &peer_cert, 0, NULL);
+    if (ret != 0) {
+      throw std::runtime_error(std::string("something went wrong while verifying quote"));
+    }
 
     arg->set_success(1);
     // auto peer_cert = arg->peer_cert();
@@ -108,6 +187,107 @@ class TlsSGXServerAuthorizationCheck
 };
 
 int main(int argc, char** argv) {
+    void* ra_tls_verify_lib           = NULL;
+    char* error;
+
+    void* helper_sgx_urts_lib = dlopen("libsgx_urts.so", RTLD_NOW | RTLD_GLOBAL);
+      if (!helper_sgx_urts_lib) {
+          mbedtls_printf("%s\n", dlerror());
+          mbedtls_printf("User requested RA-TLS verification with DCAP but cannot find helper"
+                          " libsgx_urts.so lib\n");
+          return 1;
+      }
+
+    ra_tls_verify_lib = dlopen("libra_tls_verify_dcap.so", RTLD_LAZY);
+      if (!ra_tls_verify_lib) {
+          mbedtls_printf("%s\n", dlerror());
+          mbedtls_printf("User requested RA-TLS verification with DCAP but cannot find lib\n");
+          return 1;
+      }
+
+    if (ra_tls_verify_lib) {
+      ra_tls_verify_callback_f = reinterpret_cast<int (*)(void *data, mbedtls_x509_crt *crt, int depth, uint32_t *flags)> (dlsym(ra_tls_verify_lib, "ra_tls_verify_callback"));
+      if ((error = dlerror()) != NULL) {
+          mbedtls_printf("%s\n", error);
+          return 1;
+      }
+
+      ra_tls_set_measurement_callback_f = reinterpret_cast<void (*)(int (*f_cb)(const char *mrenclave, const char *mrsigner, const char *isv_prod_id, const char *isv_svn))> (dlsym(ra_tls_verify_lib, "ra_tls_set_measurement_callback"));
+      if ((error = dlerror()) != NULL) {
+          mbedtls_printf("%s\n", error);
+          return 1;
+      }
+    }
+
+    if (argc > 2 && ra_tls_verify_lib) {
+        if (argc != 6) {
+            mbedtls_printf("USAGE: %s %s <expected mrenclave> <expected mrsigner>"
+                           " <expected isv_prod_id> <expected isv_svn>\n"
+                           "       (first two in hex, last two as decimal; set to 0 to ignore)\n",
+                           argv[0], argv[1]);
+            return 1;
+        }
+
+        mbedtls_printf("[ using our own SGX-measurement verification callback"
+                       " (via command line options) ]\n");
+
+        g_verify_mrenclave   = true;
+        g_verify_mrsigner    = true;
+        g_verify_isv_prod_id = true;
+        g_verify_isv_svn     = true;
+
+        (*ra_tls_set_measurement_callback_f)(my_verify_measurements);
+
+        if (!strcmp(argv[2], "0")) {
+            mbedtls_printf("  - ignoring MRENCLAVE\n");
+            g_verify_mrenclave = false;
+        } else if (parse_hex(argv[2], g_expected_mrenclave, sizeof(g_expected_mrenclave)) < 0) {
+            mbedtls_printf("Cannot parse MRENCLAVE!\n");
+            return 1;
+        }
+
+        if (!strcmp(argv[3], "0")) {
+            mbedtls_printf("  - ignoring MRSIGNER\n");
+            g_verify_mrsigner = false;
+        } else if (parse_hex(argv[3], g_expected_mrsigner, sizeof(g_expected_mrsigner)) < 0) {
+            mbedtls_printf("Cannot parse MRSIGNER!\n");
+            return 1;
+        }
+
+        if (!strcmp(argv[4], "0")) {
+            mbedtls_printf("  - ignoring ISV_PROD_ID\n");
+            g_verify_isv_prod_id = false;
+        } else {
+            errno = 0;
+            uint16_t isv_prod_id = (uint16_t)strtoul(argv[4], NULL, 10);
+            if (errno) {
+                mbedtls_printf("Cannot parse ISV_PROD_ID!\n");
+                return 1;
+            }
+            memcpy(g_expected_isv_prod_id, &isv_prod_id, sizeof(isv_prod_id));
+        }
+
+        if (!strcmp(argv[5], "0")) {
+            mbedtls_printf("  - ignoring ISV_SVN\n");
+            g_verify_isv_svn = false;
+        } else {
+            errno = 0;
+            uint16_t isv_svn = (uint16_t)strtoul(argv[5], NULL, 10);
+            if (errno) {
+                mbedtls_printf("Cannot parse ISV_SVN\n");
+                return 1;
+            }
+            memcpy(g_expected_isv_svn, &isv_svn, sizeof(isv_svn));
+        }
+    } else if (ra_tls_verify_lib) {
+        mbedtls_printf("[ using default SGX-measurement verification callback"
+                       " (via RA_TLS_* environment variables) ]\n");
+        (*ra_tls_set_measurement_callback_f)(NULL); /* just to test RA-TLS code */
+    } else {
+        mbedtls_printf("[ using normal TLS flows ]\n");
+    }
+
+
   // Instantiate the client. It requires a channel, out of which the actual RPCs
   // are created. This channel models a connection to an endpoint specified by
   // the argument "--target=" which is the only expected argument.
