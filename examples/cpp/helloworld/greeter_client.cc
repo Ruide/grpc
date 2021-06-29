@@ -334,8 +334,13 @@ int main(int argc, char** argv) {
   auto channel_credentials = grpc::experimental::TlsCredentials(options);
   GPR_ASSERT(channel_credentials.get() != nullptr);
 
+  auto channel_args = grpc::ChannelArguments();
+  channel_args.SetSslTargetNameOverride("RATLS");
   GreeterClient greeter(
-      grpc::CreateChannel(target_str, channel_credentials));
+      grpc::CreateCustomChannel(target_str, channel_credentials, channel_args));
+
+  // GreeterClient greeter(
+  //     grpc::CreateChannel(target_str, channel_credentials));
 
        
   std::string user("world");
@@ -366,7 +371,3 @@ int main(int argc, char** argv) {
   // GreeterClient greeter(channel);
 
   // auto channel_creds = grpc::SslCredentials(ssl_opts);
-  // auto channel_args = grpc::ChannelArguments();
-  // channel_args.SetSslTargetNameOverride("RATLS");
-  // GreeterClient greeter(
-  //     grpc::CreateCustomChannel(target_str, channel_credentials, channel_args));
